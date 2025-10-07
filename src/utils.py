@@ -5,7 +5,7 @@ from sklearn.metrics import r2_score
 
 import numpy as np
 import pandas as pd
-
+from sklearn.model_selection import GridSearchCV
 from src.exception import CustomException
 from sklearn.model_selection import train_test_split
 
@@ -22,12 +22,16 @@ def save_object(file_path,obj):
     except Exception as e:
         raise CustomException(e,sys)
     
-def evaluate_models(x_train,x_test,y_train,y_test,models):
+def evaluate_models(x_train,x_test,y_train,y_test,models,param):
     try:
         report = {}
 
         for i in range(len(list(models))):
             model = list(models.values())[i]
+            para = param[list(models.keys())[i]]
+
+            gs = GridSearchCV(model,para,cv=3)
+            gs.fit(x_train,y_train)
 
             model.fit(x_train,y_train)
 
@@ -44,3 +48,11 @@ def evaluate_models(x_train,x_test,y_train,y_test,models):
         return report
     except Exception as e:
         raise CustomException(e,sys)
+    
+def load_object(file_path):
+    try:
+        with open(file_path, "rb") as file_obj:
+            return pickle.load(file_obj)
+        
+    except Exception as e:
+        raise CustomException(e, sys)
